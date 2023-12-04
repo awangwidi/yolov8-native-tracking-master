@@ -1,14 +1,10 @@
 customtkinter==5.2.0
-matplotlib==3.7.1
 moviepy==1.0.3
 numpy==1.24.2
 numpy==1.25.0
 opencv_python==4.7.0.72
-pandas==1.5.3
-pandas==2.0.2
 Pillow==9.5.0
-Pillow==10.0.0
+Pillow==10.1.0
 PyMySQL==1.1.0
-Shapely==2.0.1
 supervision==0.11.1
 ultralytics==8.0.51

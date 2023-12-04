@@ -23,7 +23,7 @@ class App(customtkinter.CTk):
         # load images with light and dark mode image
         image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_images")
         self.logo_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "CustomTkinter_logo_single.png")), size=(26, 26))
-        self.large_test_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "python.png")), size=(250, 250))
+        self.large_test_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "python.png")), size=(50, 50))
         self.image_icon_image = customtkinter.CTkImage(Image.open(os.path.join(image_path, "image_icon_light.png")), size=(20, 20))
         self.home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(image_path, "home_dark.png")),
                                                  dark_image=Image.open(os.path.join(image_path, "home_light.png")), size=(20, 20))
@@ -65,11 +65,26 @@ class App(customtkinter.CTk):
         self.home_frame = customtkinter.CTkScrollableFrame(self, corner_radius=0, fg_color="transparent")
         self.home_frame.grid_columnconfigure(0, weight=1)
 
-        self.home_frame_large_image_label = customtkinter.CTkLabel(self.home_frame, text="", image=self.large_test_image)
-        self.home_frame_large_image_label.grid(row=0, column=0, padx=20, pady=10)
+        # self.home_frame_large_image_label = customtkinter.CTkLabel(self.home_frame, text="", image=self.large_test_image)
+        # self.home_frame_large_image_label.grid(row=0, column=0, padx=20, pady=30)
 
-        self.home_frame_button_1 = customtkinter.CTkButton(self.home_frame, text="Start Program", image=self.image_icon_image, command=main.main)
+        self.home_frame_button_1 = customtkinter.CTkButton(self.home_frame, text="Start Program", image=self.image_icon_image)#, command=main.main)
         self.home_frame_button_1.grid(row=1, column=0, padx=20, pady=10)
+
+        self.home_frame_lineentry1 = customtkinter.CTkEntry(self.home_frame, placeholder_text="Input line position 1")
+        self.home_frame_lineentry1.grid(row = 2, column=0, padx=20, pady=10)
+
+        self.home_frame_lineentry2 = customtkinter.CTkEntry(self.home_frame, placeholder_text="Input line position 2")
+        self.home_frame_lineentry2.grid(row = 3, column=0, padx=20, pady=10)
+
+        self.home_frame_lineentry3 = customtkinter.CTkEntry(self.home_frame, placeholder_text="Input line position 3")
+        self.home_frame_lineentry3.grid(row = 4, column=0, padx=20, pady=10)
+
+        self.home_frame_lineentry4 = customtkinter.CTkEntry(self.home_frame, placeholder_text="Input line position 4")
+        self.home_frame_lineentry4.grid(row = 5, column=0, padx=20, pady=10)
+
+        self.home_lineentry_defaultbtn = customtkinter.CTkButton(self.home_frame, text="Default", command=self.default_line, image=self.image_icon_image)#, command=main.main)
+        self.home_lineentry_defaultbtn.grid(row=7, column=0, padx=20, pady=10)
         # self.home_frame_button_2 = customtkinter.CTkButton(self.home_frame, text="CTkButton", image=self.image_icon_image, compound="right")
         # self.home_frame_button_2.grid(row=2, column=0, padx=20, pady=10)
         # self.home_frame_button_3 = customtkinter.CTkButton(self.home_frame, text="CTkButton", image=self.image_icon_image, compound="top")
@@ -123,6 +138,23 @@ class App(customtkinter.CTk):
 
         # select default frame
         self.select_frame_by_name("home")
+
+    def default_line(self):
+        self.home_frame_lineentry1.delete(first_index=0, last_index='end')
+        self.home_frame_lineentry2.delete(first_index=0, last_index='end')
+        self.home_frame_lineentry3.delete(first_index=0, last_index='end')
+        self.home_frame_lineentry4.delete(first_index=0, last_index='end')
+
+        self.home_frame_lineentry1.insert(index=0, string="983,854")
+        self.home_frame_lineentry2.insert(index=0, string="2105,805")
+        self.home_frame_lineentry3.insert(index=0, string="488,1188")
+        self.home_frame_lineentry4.insert(index=0, string="1988,1136")
+
+    def start_detection(self):
+        a = self.home_frame_lineentry1.get().split(',')
+        b = self.home_frame_lineentry2.get().split(',')
+        c = self.home_frame_lineentry3.get().split(',')
+        d = self.home_frame_lineentry4.get().split(',')
 
 
     def traverse_dir(self):

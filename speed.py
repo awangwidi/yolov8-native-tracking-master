@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import time
 import datetime
+import os
+
 
 from database import insert
 from supervision.detection.core import Detections
@@ -35,10 +37,8 @@ class SpeedTrap:
         self.elapsed={}
         self.a_speed_ms={}
         self.a_speed_kh={}
-        self.time1 = int
-        self.time2 = int
-        self.timestamp = []
-    def trigger(self, frame: np.ndarray, detections: Detections):
+        self.vio_list=[]
+    def trigger(self, frame: np.ndarray, detections: Detections, num_frame: int):
         """
         Update the in_count and out_count for the detections that cross the line.
 
@@ -54,31 +54,30 @@ class SpeedTrap:
             # we check if all four anchors of bbox are on the same side of vector
             x1, y1, x2, y2 = xyxy
             anchors = [
-                Point(x=x1, y=y1),
                 Point(x=x1, y=y2),
-                Point(x=x2, y=y1),
                 Point(x=x2, y=y2),
             ]
+            print(anchors)
             triggers = [self.vector.is_in(point=anchor) for anchor in anchors]
+            
             # detection is partially in and partially out
-            if len(set(triggers)) == 2:
-                continue
-
             tracker_state = triggers[0]
+            # print(f"tracker state: {tracker_state}")
             # handle new detection
             if tracker_id not in self.tracker_state:
                 self.tracker_state[tracker_id] = tracker_state
                 continue
-
+            # print(f"first: {self.tracker_state[tracker_id]}")
             # handle detection on the same side of the line
             if self.tracker_state.get(tracker_id) == tracker_state:
                 continue
-
+            # print(f"second: {self.tracker_state.get(tracker_id)}")
             self.tracker_state[tracker_id] = tracker_state
-
+            # print(f"last: {self.tracker_state[tracker_id]}")
             if tracker_state:
-                self.first=time.time()
-                self.time1 = 1
+                print("yaz")
+                self.first[tracker_id]=num_frame
+                cv2.imwrite('fertama.jpg', frame)
                 # while tracker_state2:
                 #     print("1")
                 #     tracker_state2 = triggers2[0]
@@ -98,7 +97,7 @@ class SpeedTrap:
             #     self.out_count += 1
             #     cv2.imwrite(f"salah_arah_id_{tracker_id}.png", frame)
 
-    def trigger2(self, frame: np.ndarray, detections: Detections):
+    def trigger2(self, frame: np.ndarray, filename: str, detections: Detections, num_frame: int):
         """
         Update the in_count and out_count for the detections that cross the line.
 
@@ -106,6 +105,7 @@ class SpeedTrap:
             detections (Detections): The detections for which to update the counts.
 
         """
+
         for xyxy, _, confidence, class_id, tracker_id in detections:
             # handle detections with no tracker_id
             if tracker_id is None:
@@ -114,20 +114,16 @@ class SpeedTrap:
             # we check if all four anchors of bbox are on the same side of vector
             x1, y1, x2, y2 = xyxy
             anchors = [
-                Point(x=x1, y=y1),
                 Point(x=x1, y=y2),
-                Point(x=x2, y=y1),
                 Point(x=x2, y=y2),
             ]
-            # print(f"xyxy: {x1}, {y1}, {x2}, {y2}")
+            
             triggers2 = [self.vector2.is_in(point=anchor) for anchor in anchors]
             # detection is partially in and partially out
-            if len(set(triggers2)) == 2:
-                continue
 
             tracker_state2 = triggers2[0]
             # handle new detection
-            if tracker_id not in self.tracker_state:
+            if tracker_id not in self.tracker_state2:
                 self.tracker_state2[tracker_id] = tracker_state2
                 continue
 
@@ -138,25 +134,29 @@ class SpeedTrap:
             self.tracker_state2[tracker_id] = tracker_state2
 
             if tracker_state2:
-                self.time2 = 5
                 if self.first is not None:
                     # self.second[tracker_id]=time.time()
-                    self.elapsed[tracker_id]=time.time() - self.first # type: ignore
-                    distance = 5 # meters
-                    self.a_speed_ms[tracker_id] = distance / self.elapsed[tracker_id]
-                    self.a_speed_kh[tracker_id] = self.a_speed_ms[tracker_id] * 24 * 3.6
-                    if self.a_speed_kh[tracker_id] > 30:
-                        insert(str(datetime.date.today()), jenis=f"Melanggar batas kecepatan {tracker_id}")
-                iter = (self.time1, self.time2)
-                self.timestamp.append(iter)
+                    
+                    self.elapsed[tracker_id]=num_frame - self.first[tracker_id] # type: ignore
+                    print(f"{self.elapsed[tracker_id]}")
+                    distance = 15 # meters
+                    self.a_speed_ms[tracker_id] = distance / (self.elapsed[tracker_id]/24)
+                    self.a_speed_kh[tracker_id] = self.a_speed_ms[tracker_id] * 3.6
+                    cv2.putText(frame, f"{str(int(self.a_speed_kh[tracker_id]))}km/h", (int(x2) - 5, int(y1)),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
+                    cv2.imwrite('tertungkap.jpg', frame)
+                    # if self.a_speed_kh[tracker_id] > 30:
+                        # insert(str(datetime.date.today()), jenis=f"Melanggar batas kecepatan {tracker_id}")
+                        # self.vio_list.append(filename)
                         
+                        
+                  
 
                 # if self.a_speed_kh[tracker_id] > 30:
                 #     # insert(str(datetime.date.today()), "Melanggar batas kecepatan")
                 #     RecordStart(frame=frame, begin=True, melanggar=True, id=tracker_id)
                 # elif self.a_speed_kh[tracker_id] <= 30:
                 #     RecordStart(frame=frame, begin=True, melanggar=False, id=tracker_id)
-            # if self.a_speed_kh is not None and y1 < 2100:        
+            # if self.a_speed_kh is not None and y1 < 2100:
             #     cv2.putText(frame, f"{str(int(self.a_speed_kh[tracker_id]))}km/h", (int(x2) - 5, int(y1)),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
 
     
