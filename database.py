@@ -1,7 +1,7 @@
 import pymysql
 import datetime
 
-def insert(tanggal: str, jenis: str):
+def insert(nama_file: str, jenis: str, kendaraan: str):
     conn = pymysql.connect(
         host='localhost',
         user='root',
@@ -14,10 +14,10 @@ def insert(tanggal: str, jenis: str):
     try:
         with conn.cursor() as cursor:
             # Create a new record
-            sql = "INSERT INTO `pelanggar` (`tanggal`, `jenis_pelanggaran`) VALUES (%s, %s)"
-            cursor.execute(sql, (f'{tanggal}', f'{jenis}'))
+            sql = "INSERT INTO record_pelanggaran (jenis_pelanggaran, nama_file, kendaraan) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (f'{jenis}', f'{nama_file}', f'{kendaraan}'))
 
-        # Commit changes
+       # Commit change
         conn.commit()
 
         print("Record inserted successfully")

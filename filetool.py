@@ -1,6 +1,5 @@
-import os
+import shutil
 
-def movefile(vid):
+def movefile(vid, dirvid, viodir):
     for vids in vid:
-
-        os.rename(f"./VideoPelanggar/{vids[0]}", f"./VideoPelanggarFix/{vids[0]}")
+        shutil.copy(f"{dirvid}{vids[0]}", f"{viodir}{vids[0][:-4]}/{vids[0]}")
