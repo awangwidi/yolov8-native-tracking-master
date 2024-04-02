@@ -1,9 +1,7 @@
 customtkinter==5.2.0
 moviepy==1.0.3
-numpy==1.24.2
-numpy==1.25.0
+numpy==1.23.0
 opencv_python==4.7.0.72
-Pillow==9.5.0
 Pillow==10.1.0
 PyMySQL==1.1.0
 supervision==0.11.1
